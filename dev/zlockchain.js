@@ -2,6 +2,7 @@ const sha256 = require('sha256');
 function Zlockchain() {
     this.chain = [];
     this.pendingTransactions = [];
+    this.createNewBlock(0, '0', '0');
 };
 Zlockchain.prototype.createNewBlock = function (nonce, prevBlockHash, hash) {
     const newBlock = {
@@ -40,6 +41,7 @@ Zlockchain.prototype.proofOfWork = function (prevBlockHash, currentBlockData) {
     while (hash.substring(0, 4) != '0000') {
         nonce++;
         hash = this.hashBlock(prevBlockHash, currentBlockData, nonce);
+        console.log(nonce + "haha");
     }
     return nonce;
 }

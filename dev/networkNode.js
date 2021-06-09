@@ -86,10 +86,24 @@ app.post('/register-and-broadcast-node', function (req, res) {
 app.post('/register-node', function (req, res) {
     const newNodeUrl = req.body.newNodeUrl;
 
+    const nodeNotAlreadyPresesnt = praycoin.networkNodes.indexOf(newNodeUrl) == -1;
+    const notCurrentNode = praycoin.currentNodeUrl !== newNodeUrl;
+
+    if (nodeNotAlreadyPresesnt && notCurrentNode)
+        praycoin.networkNodes.push(newNodeUrl);
+
+    res.json({ note: 'New Node registered successfully' });
 });
 
 app.post('/register-nodes-bulk', function (req, res) {
-
+    const allNetworkNodes = req.body.allNetworkNodes;
+    allNetworkNodes.forEach(networkNodeUrl => {
+        const nodeNotAlreadyPresesnt = praycoin.networkNodes.indexOf(newNodeUrl) == -1;
+        const notCurrentNode = praycoin.currentNodeUrl !== networkNodeUrl;
+        if (nodeNotAlreadyPresesnt && notCurrentNode)
+            praycoin.networkNodes.push(networkNodeUrl);
+    });
+    res.json({ note: 'Bulk registration successful' });
 });
 
 app.listen(port, function () {

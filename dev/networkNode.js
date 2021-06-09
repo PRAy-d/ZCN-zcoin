@@ -98,7 +98,7 @@ app.post('/register-node', function (req, res) {
 app.post('/register-nodes-bulk', function (req, res) {
     const allNetworkNodes = req.body.allNetworkNodes;
     allNetworkNodes.forEach(networkNodeUrl => {
-        const nodeNotAlreadyPresesnt = praycoin.networkNodes.indexOf(newNodeUrl) == -1;
+        const nodeNotAlreadyPresesnt = praycoin.networkNodes.indexOf(networkNodeUrl) == -1;
         const notCurrentNode = praycoin.currentNodeUrl !== networkNodeUrl;
         if (nodeNotAlreadyPresesnt && notCurrentNode)
             praycoin.networkNodes.push(networkNodeUrl);

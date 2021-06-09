@@ -1,5 +1,8 @@
 const sha256 = require('sha256');
 const currentNodeUrl = process.argv[3];
+const uuid = require('uuid/v1');
+
+
 function Zlockchain() {
     this.chain = [];
     this.pendingTransactions = [];
@@ -31,10 +34,15 @@ Zlockchain.prototype.createNewTransaction = function (amount, sender, recipient)
         amount: amount,
         sender: sender,
         recipient: recipient,
+        transactionId: uuid().split('-').join('')
     };
-    this.pendingTransactions.push(newTransaction);
-    return this.getLastBlock()['index'] + 1;
+
+    return newTransaction;
 };
+Zlockchain.prototype.addTransactionToPendingTransactions = function (transactionObj) {
+    this.pendingTransactions.push(transactionObj);
+    return this.getLastBlock()['index'] + 1;
+}
 Zlockchain.prototype.hashBlock = function (prevBlockHash, currentBlockData, nonce) {
     const blockdata = prevBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
     const hash = sha256(blockdata);

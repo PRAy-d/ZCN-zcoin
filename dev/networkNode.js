@@ -41,7 +41,7 @@ app.post('/transaction/broadcast', function (req, res) {
             method: 'POST',
             body: newTransaction,
             json: true
-        }
+        };
         requestPromises.push(rp(requestOptions));
     });
     Promise.all(requestPromises)
@@ -63,12 +63,36 @@ app.get('/mine', function (req, res) {
     const blockHash = praycoin.hashBlock(prevBlockHash, currentBlockData, nonce);
     const newBlock = praycoin.createNewBlock(nonce, prevBlockHash, blockHash);
 
-    res.json({
-        note: "New Block mined successfully",
-        block: newBlock
+    const requestPromises = [];
+    praycoin.networkNodes.forEach(networkNodeUrl => {
+        const requestOptions = {
+            uri: networkNodeUrl + '/receive-new-block',
+            method: 'POST',
+            body: { newBlock: newBlock },
+            json: true
+        };
+        requestPromises.push(rp(requestOptions));
     });
-
-    praycoin.createNewTransaction(1, "00", nodeAddress)
+    Promise.all(requestPromises)
+        .then(data => {
+            const requestOptions = {
+                uri: praycoin.currentNodeUrl + '/transaction/broadcast',
+                method: 'POST',
+                body: {
+                    amount: 100,
+                    sender: "00",
+                    recipient: nodeAddress,
+                },
+                json: true
+            };
+            return rp(requestOptions);
+        })
+        .then(data => {
+            res.json({
+                note: 'New Block mined and broadcast successfully',
+                block: newBlock
+            });
+        });
 });
 
 app.post('/register-and-broadcast-node', function (req, res) {

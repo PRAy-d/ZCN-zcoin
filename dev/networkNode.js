@@ -13,7 +13,7 @@ const praycoin = new Zlockchain();
 const uuid = require('uuid/v1');
 const nodeAddress = uuid().split('-').join('');
 
-
+const rp = require('request-promise');
 app.get('/', function (req, res) {
     res.send('Zlockchain bebe')
 });
@@ -47,6 +47,49 @@ app.get('/mine', function (req, res) {
     });
 
     praycoin.createNewTransaction(1, "00", nodeAddress)
+});
+
+app.post('/register-and-broadcast-node', function (req, res) {
+    const newNodeUrl = req.body.newNodeUrl;
+
+    if (praycoin.networkNodes.indexOf(newNodeUrl) == -1)
+        praycoin.networkNodes.push(newNodeUrl);
+
+    const regNodesPromises = [];
+    praycoin.networkNodes.forEach(networkNodeUrl => {
+        const requestOptions = {
+            uri: networkNodeUrl + '/register-node',
+            method: 'POST',
+            body: { newNodeUrl: newNodeUrl },
+            json: true,
+        }
+        regNodesPromises.push(rp(requestOptions));
+    });
+    Promise.all(regNodesPromises)
+        .then(data => {
+            const bulkRegisterOptions = {
+                uri: newNodeUrl + '/register-nodes-bulk',
+                method: 'POST',
+                body: {
+                    allNetworkNodes: [...praycoin.networkNodes,
+                    praycoin.currentNodeUrl]
+                },
+                json: true
+            };
+            return rp(bulkRegisterOptions);
+        })
+        .then(data => {
+            res.json({ note: 'New Node registered with network successfully' });
+        });
+});
+
+app.post('/register-node', function (req, res) {
+    const newNodeUrl = req.body.newNodeUrl;
+
+});
+
+app.post('/register-nodes-bulk', function (req, res) {
+
 });
 
 app.listen(port, function () {

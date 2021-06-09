@@ -1,7 +1,12 @@
 const sha256 = require('sha256');
+const currentNodeUrl = process.argv[3];
 function Zlockchain() {
     this.chain = [];
     this.pendingTransactions = [];
+
+    this.currentNodeUrl = currentNodeUrl;;
+    this.networkNodes = [];
+
     this.createNewBlock(0, '0', '0');
 };
 Zlockchain.prototype.createNewBlock = function (nonce, prevBlockHash, hash) {

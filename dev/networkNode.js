@@ -23,11 +23,33 @@ app.get('/zlockchain', function (req, res) {
 });
 
 app.post('/transaction', function (req, res) {
-    const blockIndex = praycoin.createNewTransaction(req.body.amount,
-        req.body.sender, req.body.recipient)
+    const newTransaction = req.body;
+    const blockIndex = praycoin.addTransactionToPendingTransactions(newTransaction);
     res.json({
         note: `transaction will be added in block ${blockIndex}`
     });
+});
+app.post('/transaction/broadcast', function (req, res) {
+    const newTransaction = praycoin.createNewTransaction(req.body.amount,
+        req.body.sender, req.body.recipient);
+    praycoin.addTransactionToPendingTransactions(newTransaction);
+
+    const requestPromises = [];
+    praycoin.networkNodes.forEach(networkNodeUrl => {
+        const requestOptions = {
+            uri: networkNodeUrl + '/transaction',
+            method: 'POST',
+            body: newTransaction,
+            json: true
+        }
+        requestPromises.push(rp(requestOptions));
+    });
+    Promise.all(requestPromises)
+        .then(data => {
+            res.json({
+                note: 'transaction created and broadcast successfully'
+            })
+        });
 });
 
 app.get('/mine', function (req, res) {

@@ -99,7 +99,7 @@ app.post('/receive-new-block', function (req, res) {
     const newBlock = req.body.newBlock;
     const lastBlock = praycoin.getLastBlock();
 
-    const correctHash = lastBlock.hash === newBlock.previousBlockHash;
+    const correctHash = lastBlock.hash === newBlock.prevBlockHash;
     const correctIndex = lastBlock['index'] + 1 === newBlock['index'];
 
     if (correctHash && correctIndex) {

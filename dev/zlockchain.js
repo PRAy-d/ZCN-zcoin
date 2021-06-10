@@ -57,4 +57,33 @@ Zlockchain.prototype.proofOfWork = function (prevBlockHash, currentBlockData) {
     }
     return nonce;
 }
+Zlockchain.prototype.chainIsValid = function (zlockchain) {
+    let validChain = true;
+
+    const genesisBlock = zlockchain[0];
+    const correctNonce = genesisBlock['nonce'] === 0;
+    const correctPrevBlockHash = genesisBlock['prevBlockHash'] === '0';
+    const correctHash = genesisBlock['hash'] === '0';
+    const correctTransactions = genesisBlock['transactions'].length === 0;
+
+    if (!correctHash || !correctNonce || !correctPrevBlockHash || correctTransactions)
+        validChain = false;
+
+    for (var i = 1; i < zlockchain.length; i++) {
+        const currentBlock = zlockchain[i];
+        const prevBlock = zlockchain[i - 1];
+
+        const blockhash = this.hashBlock(prevBlock['hash'], {
+            transactions: currentBlock['transactions'],
+            index: currentBlock['index']
+        }, currentBlock['nonce']);
+
+        if (blockhash.substring(0, 4) !== '0000')
+            validChain = false;
+
+        if (currentBlock['prevBlockHash'] !== prevBlock['hash'])
+            validChain = false;
+    };
+    return validChain;
+};
 module.exports = Zlockchain;

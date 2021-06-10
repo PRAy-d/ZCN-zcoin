@@ -88,4 +88,13 @@ Zlockchain.prototype.chainIsValid = function (zlockchain) {
 
     return validChain;
 };
+
+Zlockchain.prototype.getBlock = function (blockHash) {
+    let correctBlock = null;
+    this.chain.forEach(block => {
+        if (block.hash === blockHash)
+            correctBlock = block;
+    });
+    return correctBlock;
+};
 module.exports = Zlockchain;

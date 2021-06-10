@@ -58,7 +58,7 @@ Zlockchain.prototype.proofOfWork = function (prevBlockHash, currentBlockData) {
     return nonce;
 }
 Zlockchain.prototype.chainIsValid = function (zlockchain) {
-    let validChain = "seggsy";
+    let validChain = true;
 
     for (var i = 1; i < zlockchain.length; i++) {
         const currentBlock = zlockchain[i];
@@ -70,10 +70,10 @@ Zlockchain.prototype.chainIsValid = function (zlockchain) {
         }, currentBlock['nonce']);
 
         if (blockhash.substring(0, 4) !== '0000')
-            validChain = "Fail!";
+            validChain = false;
 
         if (currentBlock['prevBlockHash'] !== prevBlock['hash'])
-            validChain = "Fail!";
+            validChain = false;
 
     };
 
@@ -84,7 +84,7 @@ Zlockchain.prototype.chainIsValid = function (zlockchain) {
     const correctTransactions = genesisBlock['transactions'].length === 0;
 
     if (!correctHash || !correctNonce || !correctPrevBlockHash || !correctTransactions)
-        validChain = "Fail!";
+        validChain = false;
 
     return validChain;
 };

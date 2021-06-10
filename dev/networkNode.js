@@ -176,6 +176,46 @@ app.post('/register-nodes-bulk', function (req, res) {
     res.json({ note: 'Bulk registration successful' });
 });
 
+app.get('/consensus', function (req, res) {
+    const requestPromises = [];
+    praycoin.networkNodes.forEach(networkNodeUrl => {
+        const requestOptions = {
+            uri: networkNodeUrl + '/zlockchain',
+            method: 'GET',
+            json: true
+        }
+        requestPromises.push(rp(requestOptions));
+    });
+    Promise.all(requestPromises)
+        .then(zlockchains => {
+            const currentChainLength = praycoin.chain.length;
+            let maxChainLength = currentChainLength;
+            let newLongestChain = null;
+            let newPendingTransactions = null;
+
+            zlockchains.forEach(zlockchain => {
+                if (zlockchain.chain.length > maxChainLength) {
+                    maxChainLength = zlockchain.chain.length;
+                    newLongestChain = zlockchain.chain;
+                    newPendingTransactions = zlockchain.pendingTransactions;
+                }
+            });
+            if (!newLongestChain || (newLongestChain && !praycoin.chainIsValid(newLongestChain))) {
+                res.json({
+                    note: 'Current chain has not been replaced',
+                    chain: praycoin.chain
+                })
+            }
+            else {
+                praycoin.chain = newLongestChain;
+                praycoin.pendingTransactions = newPendingTransactions;
+                res.json({
+                    note: 'This chain has been replaced',
+                    chain: praycoin.chain
+                });
+            }
+        });
+});
 app.listen(port, function () {
     console.log(`listening on port ${port}...`);
 });

@@ -58,16 +58,7 @@ Zlockchain.prototype.proofOfWork = function (prevBlockHash, currentBlockData) {
     return nonce;
 }
 Zlockchain.prototype.chainIsValid = function (zlockchain) {
-    let validChain = true;
-
-    const genesisBlock = zlockchain[0];
-    const correctNonce = genesisBlock['nonce'] === 0;
-    const correctPrevBlockHash = genesisBlock['prevBlockHash'] === '0';
-    const correctHash = genesisBlock['hash'] === '0';
-    const correctTransactions = genesisBlock['transactions'].length === 0;
-
-    if (!correctHash || !correctNonce || !correctPrevBlockHash || correctTransactions)
-        validChain = false;
+    let validChain = "seggsy";
 
     for (var i = 1; i < zlockchain.length; i++) {
         const currentBlock = zlockchain[i];
@@ -79,11 +70,22 @@ Zlockchain.prototype.chainIsValid = function (zlockchain) {
         }, currentBlock['nonce']);
 
         if (blockhash.substring(0, 4) !== '0000')
-            validChain = false;
+            validChain = "Fail!";
 
         if (currentBlock['prevBlockHash'] !== prevBlock['hash'])
-            validChain = false;
+            validChain = "Fail!";
+
     };
+
+    const genesisBlock = zlockchain[0];
+    const correctNonce = genesisBlock['nonce'] === 0;
+    const correctPrevBlockHash = genesisBlock['prevBlockHash'] === '0';
+    const correctHash = genesisBlock['hash'] === '0';
+    const correctTransactions = genesisBlock['transactions'].length === 0;
+
+    if (!correctHash || !correctNonce || !correctPrevBlockHash || !correctTransactions)
+        validChain = "Fail!";
+
     return validChain;
 };
 module.exports = Zlockchain;

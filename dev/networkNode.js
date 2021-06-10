@@ -107,7 +107,7 @@ app.post('/receive-new-block', function (req, res) {
         praycoin.pendingTransactions = [];
 
         res.json({
-            note: 'New block received and accepted',
+            note: 'New block accepted and received ',
             newBlock: newBlock
         });
     }

@@ -1,2 +1,2 @@
-# zlockchain
+# ZCN
 custom blockchain
